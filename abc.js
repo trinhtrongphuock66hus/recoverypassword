@@ -9,24 +9,26 @@ signInButton.addEventListener("click", function() {
   // Kiểm tra tính hợp lệ của tên đăng nhập và mật khẩu
   console.log(`Username: `,username,`Email: `,email);
 
-  // khởi tạo đối tượng XMLHttpRequest
-  var xhttp = new XMLHttpRequest();
+  // Tạo một đối tượng mới để chứa thông tin người dùng
+  var newUser = {
+    user: username,
+    email: email
+  };
 
-  // Xác định hành động khi nhận được phản hồi từ máy chủ
+  // Gửi yêu cầu HTTP POST đến địa chỉ '/recovery'
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "http://192.168.2.6/recovery", true);
+  xhttp.setRequestHeader("Content-type", "application/json");
+
+  // Gửi thông tin tài khoản và mật khẩu dưới dạng JSON
+  var data = JSON.stringify(newUser);
+  xhttp.send(data);
+
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       // Xử lý kết quả trả về từ máy chủ
-      var data = JSON.parse(this.responseText);
-      const nguoiDung = data.find(user => user.user === username && user.email === email );
-      if (nguoiDung) {
-        // Tài khoản đã tồn tại
-        alert("Mật khẩu là '" + nguoiDung.pass + "'" );
-      } else {
-        alert("Tài khoản hoặc email không đúng");
-      }
+      var responseData = JSON.parse(this.responseText);
+      alert(responseData.message);
     }
   };
-  // Gửi yêu cầu HTTP GET đến địa chỉ '/users'
-  xhttp.open("GET", "http://192.168.2.6:3000/users", true);
-  xhttp.send();
 });
